@@ -28,6 +28,7 @@ global.userInfo = null;
 global.setLoaded = (user) => {
     if (user === undefined || user === null) {
         this.isLoaded = false;
+        this.userInfo=null
     } else {
         this.userInfo = JSON.parse(user);
         this.isLoaded = true

@@ -9,12 +9,22 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import ImagePicker from 'react-native-image-picker'
+import Button from 'apsl-react-native-button'
 import Sha1 from 'sha1'
+import EditUserDialog from './EditUserDialog'
+
+import {NavigationActions} from 'react-navigation'
+const resetAction = NavigationActions.reset({
+    index: 0,
+    actions: [
+        NavigationActions.navigate({routeName: 'Login'})
+    ]
+});
 export default class index extends Component {
     static navigationOptions = ({navigation}) => ({
-            headerRight: <TouchableOpacity>
-                <Icon size={30} name="ios-analytics-outline"/>
-            </TouchableOpacity>
+        headerRight: <TouchableOpacity>
+            <Icon size={30} name="ios-analytics-outline"/>
+        </TouchableOpacity>
     });
 
 
@@ -36,9 +46,30 @@ export default class index extends Component {
                                 style={styles.avatar}/>
                         </TouchableOpacity>
                 }
+                <Button
+                    onPress={this._loginOut}
+                    style={styles.loginOutView}
+                    textStyle={styles.btnText}
+                    title="">
+                    退出登录
+                </Button>
+                <EditUserDialog ref={editUserDialog => this.editUserDialog = editUserDialog}/>
             </View>
         )
     }
+
+    _showD = () => {
+        this.editUserDialog.show()
+    };
+
+    _loginOut = () => {
+        setLoaded(null);
+        AsyncStorage.removeItem("user", (error) => {
+            if (error) return Toast.error(error.toString());
+            Toast.success("成功退出登录！！！");
+            this.props.navigation.dispatch(resetAction)
+        })
+    };
 
     _chooseImage = () => {
         let options = {
@@ -159,5 +190,20 @@ const styles = StyleSheet.create({
         marginTop: 10,
         justifyContent: "center",
         alignItems: "center"
-    }
+    },
+    loginOutView: {
+        backgroundColor: Colors.primary,
+        width: SCREEN_WIDTH * 0.7,
+        height: 40,
+        marginTop: 20,
+        alignItems: "center",
+        justifyContent: "center",
+        borderColor: "transparent",
+        alignSelf: "center"
+    },
+    btnText: {
+        color: Colors.white,
+        fontSize: 16,
+        fontWeight: "bold"
+    },
 });

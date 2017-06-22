@@ -125,10 +125,9 @@ export default class Login extends Component {
                 .then(data => {
                     Toast.success("登录成功！");
                     AsyncStorage.multiSet([['phone', this.state.phone], ['user', JSON.stringify(data)]], (error) => {
-                            if (error)
-                                Toast.error(error.toString());
-                            else
-                                this.props.navigation.dispatch(resetAction)
+                            if (error) return Toast.error(error.toString());
+                            setLoaded(JSON.stringify(data));
+                            this.props.navigation.dispatch(resetAction)
                         }
                     );
                 })

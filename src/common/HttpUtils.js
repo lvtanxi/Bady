@@ -12,54 +12,54 @@ import Mock  from 'mockjs'
 export default class HttpUtils {
     //基于 fetch 封装的 GET请求
     static getFatch(url, params) {
-        if (params) {
-            let paramsArray = [];
-            Object.keys(params).forEach(key => paramsArray.push(key + '=' + encodeURIComponent(params[key])))
-            if (url.search(/\?/) === -1) {
-                url += '?' + paramsArray.join('&')
-            } else {
-                url += '&' + paramsArray.join('&')
-            }
-        }
-        return new Promise((resolve, reject) => {
-            fetch(BaseUrl+url)
-                .then((response) => {
-                    if (response.ok)
-                        return response.json();
-                    reject && reject({status: response.status})
-                })
-                .then((response) => {
-                    resolve(Mock.mock(response).data);
-                })
-                .catch((error) => {
-                    Toast.error(error.toString());
-                    reject && reject(error)
-                }).done()
-        })
+        return HttpUtils.http("GET", url, params)
     }
 
-//基于 fetch 封装的 POST请求
-    static postFatch(url, params = {}) {
-        return new Promise((resolve, reject) => {
-            fetch(BaseUrl+url, {
+
+    static http(type, url, params) {
+        let httpPromise;
+        if (type === "GET") {
+            if(params){
+                let paramsArray = [];
+                Object.keys(params).forEach(key => paramsArray.push(key + '=' + encodeURIComponent(params[key])));
+                if (url.search(/\?/) === -1) {
+                    url += '?' + paramsArray.join('&')
+                } else {
+                    url += '&' + paramsArray.join('&')
+                }
+            }
+            httpPromise = fetch(BaseUrl + url);
+        } else if (type === "POST") {
+            httpPromise = fetch(BaseUrl + url, {
                 method: 'POST',
                 header: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(params)
-            }).then((response) => {
+            });
+        }
+        return new Promise((resolve, reject) => {
+            httpPromise.then((response) => {
                 if (response.ok)
                     return response.json();
-                reject && reject({status: response.status})
+                if (reject && reject !== null)
+                    reject({status: response.status})
             })
                 .then((response) => {
                     resolve(Mock.mock(response).data);
                 })
                 .catch((error) => {//密码
                     Toast.error(error.toString());
-                    reject && reject(error)
+                    if (reject && reject !== null)
+                        reject(error)
                 }).done()
         })
     }
+
+//基于 fetch 封装的 POST请求
+    static postFatch(url, params = {}) {
+        return HttpUtils.http("POST", url, params)
+    }
+
 }

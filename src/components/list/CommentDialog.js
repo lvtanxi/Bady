@@ -37,10 +37,8 @@ export default class CommentDialog extends BaseDialog {
 
     _submit = () => {
         if (this.state.isSendingComment)return;
-        if (!this.state.text) {
-            Toast.warning("评论不能为空");
-            return
-        }
+        if (!this.state.text)
+            return  Toast.warning("评论不能为空");
         this.setState({isSendingComment: true}, () => {
             HttpUtils.postFatch("api/comment", {
                 accessToken: "1",
